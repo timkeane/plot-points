@@ -1,7 +1,7 @@
 {
   "name": "plot-points",
-  "version": "2.0.0",
-  "description": "Face coverings are being distributed in parks across NYC. Find the closest location.",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo no tests",
