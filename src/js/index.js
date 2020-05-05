@@ -55,8 +55,8 @@ const editFeature = (coordinate, feature) => {
         }
       })
       if (feature._addme) {
-        feature._addme = false
         source.addFeature(feature)
+        feature._addme = false
       }
       popup.hide()
     })
@@ -108,13 +108,14 @@ map.on('click', event => {
   if ($(popup.element).find('.pop').is(':visible') && $('.move').hasClass('pressed')) {
     feature = popup.feature
     feature.setGeometry(point)
+  } else {
+    feature._addme = true
+    map.forEachFeatureAtPixel(event.pixel, (feat, lyr) => {
+      if (lyr === layer) {
+        feature = feat
+      }
+    })
   }
-  feature._addme = true
-  map.forEachFeatureAtPixel(event.pixel, (feat, lyr) => {
-    if (lyr === layer) {
-      feature = feat
-    }
-  })
   editFeature(event.coordinate, feature)
 })
 
