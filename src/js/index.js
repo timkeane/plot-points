@@ -14,6 +14,7 @@ import schema from './schema'
 
 const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
 const popupHtml = '<div class="feature"></div><div class="btns"><button class="move btn rad-all">Move</button><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
+const boroSelect = '<select class="value"><option value="2">Bronx</option><option value="3">Brooklyn</option><option value="1">Manhattan</option><option value="4">Queens</option><option value="5">Staten Island</option>'
 
 const map = new Basemap({target: 'map'})
 const popup = new Popup({map, layers: []})
@@ -36,11 +37,17 @@ const getCsvUrl = () => {
 }
 
 const input = (props, prop) => {
-  const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
-  if (prop.toLowerCase().indexOf('date') > -1) {
-    input.attr('type', 'date') 
+  if (prop === 'boro') {
+    return $(boroSelect).val(props.boro)
+  } else {
+    const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
+    if (prop.toLowerCase().indexOf('date') > -1) {
+      input.attr('type', 'date')
+    } else if (prop.toLowerCase().indexOf('time') > -1) {
+      input.attr('type', 'time')
+    }
+    return input
   }
-  return input
 }
 
 const editFeature = (coordinate, feature) => {
@@ -50,7 +57,7 @@ const editFeature = (coordinate, feature) => {
     const html = $(popupHtml)
     const props = feature.getProperties()
     Object.keys(props).forEach(prop => {
-      if (prop !== 'geometry') {
+      if ($.inArray(prop, ['geometry', 'x', 'y']) === -1) {
         const nameValue = $('<div class="prop"></div>')
           .append(`<label for="${prop}" class="name">${prop}</span>`)
           .append(input(props, prop))
