@@ -70,7 +70,8 @@ body * {
   text-align: center;
 }
 .pop button {
-  width: 70px;
+  font-size: 12px;
+  width: 51px;
   margin: 5px 5px 5px 0;
 }
 .delete {
@@ -80,4 +81,14 @@ body * {
 .save {
   color: green;
   border-color: green;
+}
+.move {
+  color: blue;
+  border-color: blue;
+}
+.move.pressed {
+  color: blue;
+  background-color: blue;
+  color: white;
+  border-color: white;
 }

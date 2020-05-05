@@ -14,7 +14,7 @@ import schema from './schema'
 
 const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
 const csv_url = '/git/face-coverings/dist/data/location.csv'
-const popupHtml = '<div class="feature"></div><div class="btns"><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
+const popupHtml = '<div class="feature"></div><div class="btns"><button class="move btn rad-all">Move</button><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
 
 const map = new Basemap({target: 'map'})
 const source = new Source()
@@ -47,6 +47,7 @@ const editFeature = (coordinate, feature) => {
         html.first().append(nameValue)
       }
     })
+
     html.find('.save').click(() => {
       Object.keys(props).forEach(prop => {
         if (prop !== 'geometry') {
@@ -59,15 +60,29 @@ const editFeature = (coordinate, feature) => {
       }
       popup.hide()
     })
+
     html.find('.delete').click(() => {
       if (!feature._addme) {
         source.removeFeature(feature)
       }
       popup.hide()
     })
+
+    html.find('.move').click(event => {
+      const move = $(event.target)
+      move.toggleClass('pressed')
+      feature._moving = move.hasClass('pressed')
+    })
+
     html.find('.cancel').click($.proxy(popup.hide, popup))
+
+    if (feature._moving) {
+      html.find('.move').addClass('pressed')
+    }
+
     return html
   }
+  popup.feature = feature
   popup.showFeature(feature)
 }
 
@@ -88,7 +103,12 @@ const getSchema = () => {
 
 map.on('click', event => {
   let feature = new Feature(getSchema())
-  feature.setGeometry(new Point(event.coordinate))
+  const point = new Point(event.coordinate)
+  feature.setGeometry(point)
+  if ($(popup.element).find('.pop').is(':visible') && $('.move').hasClass('pressed')) {
+    feature = popup.feature
+    feature.setGeometry(point)
+  }
   feature._addme = true
   map.forEachFeatureAtPixel(event.pixel, (feat, lyr) => {
     if (lyr === layer) {
@@ -141,3 +161,4 @@ $('.save-csv').click(() => {
 global.map = map
 global.source = source
 global.layer = layer
+global.popup = popup
