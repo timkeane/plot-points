@@ -23,11 +23,11 @@ const location = feature => {
     image: new Circle({
       radius: 8,
       fill: new Fill({
-        color: fresh ? 'rgba(128,61,141,.7)' : 'rgba(255,0,0,.5)'
+        color: fresh ? 'rgba(0,255,0,.5)' : 'rgba(255,0,0,.5)'
       }),
       stroke: new Stroke({
         width: 1, 
-        color: fresh ? '#803D8D' : '#ff0000'
+        color: fresh ? '#00ff00' : '#ff0000'
       })
     })
   })
