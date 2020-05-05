@@ -15,21 +15,30 @@ body * {
   right: 0;
   bottom: 0;
 }
-.photo, .csv {
+.photo,
+.save-csv,
+.load-csv {
   position: fixed;
   background-color: rgba(0,0,0,.55);
   text-align: center;
   color: #fff;
   width: 105px;
-  bottom: 10px;
 }
 .photo {
   left: 10px;
+  bottom: 10px;
 }
-.csv {
+.save-csv {
   right: 10px;
+  bottom: 10px;
 }
-.photo:hover, .csv:hover {
+.load-csv {
+  right: 10px;
+  bottom: 50px;
+}
+.photo:hover,
+.save-csv:hover,
+.load-csv:hover {
   background-color: #000;
 }
 .pop>.content {

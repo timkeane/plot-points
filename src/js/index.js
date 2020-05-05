@@ -7,10 +7,12 @@ import Papa from 'papaparse'
 import Basemap from 'nyc-lib/nyc/ol/Basemap'
 import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
 import Popup from 'nyc-lib/nyc/ol/FeaturePopup'
+import CsvPoint from 'nyc-lib/nyc/ol/format/CsvPoint'
+import AutoLoad from 'nyc-lib/nyc/ol/source/AutoLoad'
 import schema from './schema'
 
-const url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
-
+const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
+const csv_url = '/git/face-coverings/dist/data/location.csv'
 const popupHtml = '<div class="feature"></div><div class="btns"><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
 
 const map = new Basemap({target: 'map'})
@@ -19,7 +21,7 @@ const layer = new Layer({source, zIndex: 20000})
 const popup = new Popup({map, layers: []})
 
 map.addLayer(layer)
-new LocationMgr({map, url})
+new LocationMgr({map, url: geo_url})
 
 const input = (props, prop) => {
   const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
@@ -67,8 +69,23 @@ const editFeature = (coordinate, feature) => {
   popup.showFeature(feature)
 }
 
+const getSchema = () => {
+  const features = source.getFeatures()
+  if (features.length > 0) {
+    const result = {}
+    const props = features[0].getProperties()
+    Object.keys(props).forEach(prop => {
+      if (prop !== 'geometry') {
+        result[prop] = ''
+      }
+    })
+    return result
+  }
+  return schema
+}
+
 map.on('click', event => {
-  let feature = new Feature(schema)
+  let feature = new Feature(getSchema())
   feature.setGeometry(new Point(event.coordinate))
   feature._addme = true
   map.forEachFeatureAtPixel(event.pixel, (feat, lyr) => {
@@ -86,7 +103,22 @@ $('.photo').click(() => {
   $('.photo').html(photo ? 'Base Map' : 'Aerial Photo')
 })
 
-$('.csv').click(() => {
+$('.load-csv').click(() => {
+  const format = new CsvPoint({
+    x: 'X',
+    y: 'Y',
+    dataProjection: 'EPSG:2263'
+  })
+  new AutoLoad({
+    format,
+    url: csv_url
+  }).autoLoad().then(features => {
+    source.clear()
+    source.addFeatures(features)
+  })
+})
+
+$('.save-csv').click(() => {
   const rows = []
   source.getFeatures().forEach(feature => {
     const coord = proj4('EPSG:3857', 'EPSG:2263', feature.getGeometry().getCoordinates())
