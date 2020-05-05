@@ -7,17 +7,19 @@ import Papa from 'papaparse'
 import Basemap from 'nyc-lib/nyc/ol/Basemap'
 import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
 import Popup from 'nyc-lib/nyc/ol/FeaturePopup'
+import schema from './schema'
 
 const url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
-const map = new Basemap({target: 'map'})
-const locationMgr = new LocationMgr({map, url})
 
+const popupHtml = '<div class="feature"></div><div class="btns"><button class="save btn rad-all">Save</button><button class="cancel btn rad-all">Cancel</button></div>'
+
+const map = new Basemap({target: 'map'})
 const source = new Source()
 const layer = new Layer({source, zIndex: 20000})
+const popup = new Popup({map, layers: []})
 
 map.addLayer(layer)
-
-const popup = new Popup({map, layers: []})
+new LocationMgr({map, url})
 
 const input = (props, prop) => {
   const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
@@ -26,8 +28,6 @@ const input = (props, prop) => {
   }
   return input
 }
-
-const popupHtml = '<div class="feature"></div><div class="btns"><button class="save btn rad-all">Save</button><button class="cancel btn rad-all">Cancel</button></div>'
 
 const editFeature = (coordinate, feature) => {
   const props = feature.getProperties()
@@ -62,7 +62,7 @@ const editFeature = (coordinate, feature) => {
 }
 
 map.on('click', event => {
-  let feature = new Feature({name: '', location: '', date1: '', time1: '', date2: '', time2: ''})
+  let feature = new Feature(schema)
   feature.setGeometry(new Point(event.coordinate))
   feature._addme = true
   map.forEachFeatureAtPixel(event.pixel, (feat, lyr) => {
@@ -97,4 +97,3 @@ $('.csv').click(() => {
   console.warn('TODO: save this csv to a file')
   console.log(csv)
 })
-

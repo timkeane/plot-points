@@ -1,0 +1,1 @@
+export default {name: '', location: '', date1: '', time1: '', date2: '', time2: ''}
