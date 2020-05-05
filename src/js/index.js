@@ -4,6 +4,7 @@ import Layer from 'ol/layer/Vector'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import Papa from 'papaparse'
+import Dialog from 'nyc-lib/nyc/Dialog'
 import Basemap from 'nyc-lib/nyc/ol/Basemap'
 import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
 import Popup from 'nyc-lib/nyc/ol/FeaturePopup'
@@ -13,8 +14,9 @@ import style from './style'
 import schema from './schema'
 
 const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
-const csv_url = '/git/face-coverings/dist/data/location.csv'
 const popupHtml = '<div class="feature"></div><div class="btns"><button class="move btn rad-all">Move</button><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
+
+const dialog = new Dialog({target: 'body'})
 
 const map = new Basemap({target: 'map'})
 const popup = new Popup({map, layers: []})
@@ -28,6 +30,13 @@ const layer = new Layer({
 
 map.addLayer(layer)
 locationMgr.mapLocator.layer.setStyle(style.geocode)
+
+const getCsvUrl = () => {
+  const search = document.location.search
+  if (search && search.indexOf('csv=') > -1 && search.indexOf('=') === search.lastIndexOf('=')) {
+    return decodeURIComponent(search.split('=')[1])
+  }
+}
 
 const input = (props, prop) => {
   const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
@@ -62,6 +71,7 @@ const editFeature = (coordinate, feature) => {
         source.addFeature(feature)
         feature._addme = false
       }
+      feature._moving_from = false
       popup.hide()
     })
 
@@ -75,13 +85,13 @@ const editFeature = (coordinate, feature) => {
     html.find('.move').click(event => {
       const move = $(event.target)
       move.toggleClass('pressed')
-      feature._moving_from = move.hasClass('pressed') ? feature.getGeometry() : false
+      feature._moving_from = move.hasClass('pressed') ? feature.getGeometry().getCoordinates() : false
     })
 
     html.find('.cancel').click(() => {
       popup.hide()
       if (feature._moving_from) {
-        feature.setGeometry(feature._moving_from)
+        feature.setGeometry(new Point(feature._moving_from))
         feature._moving_from = false
       }
     })
@@ -102,7 +112,7 @@ const getSchema = () => {
     const result = {}
     const props = features[0].getProperties()
     Object.keys(props).forEach(prop => {
-      if ($.inArray(prop, ['geometry', 'X', 'Y', 'x', 'y'])) {
+      if ($.inArray(prop, ['geometry', 'x', 'y']) === -1) {
         result[prop] = ''
       }
     })
@@ -136,19 +146,29 @@ $('.photo').click(() => {
   $('.photo').html(photo ? 'Base Map' : 'Aerial Photo')
 })
 
-$('.load-csv').click(() => {
-  const format = new CsvPoint({
-    x: 'X',
-    y: 'Y',
-    dataProjection: 'EPSG:2263'
-  })
+const loadCsv = url => {
   new AutoLoad({
-    format,
-    url: csv_url
+    url,
+    format: new CsvPoint({
+      x: 'x',
+      y: 'y',
+      dataProjection: 'EPSG:2263'
+    })
   }).autoLoad().then(features => {
     source.clear()
     source.addFeatures(features)
   })
+}
+
+$('.load-csv').click(() => {
+  const csvUrl = getCsvUrl()
+  if (csvUrl) {
+    loadCsv(csvUrl)
+  } else {
+    dialog.input({}).then(url => {
+      loadCsv(url)
+    })  
+  }
 })
 
 $('.save-csv').click(() => {
@@ -158,7 +178,7 @@ $('.save-csv').click(() => {
     const row = {x: coord[0], y: coord[1]}
     const props = feature.getProperties()
     Object.keys(props).forEach(prop => {
-      if (prop !== 'geometry') {
+      if ($.inArray(prop, ['geometry', 'x', 'y']) === -1) {
         row[prop] = props[prop]
       }
     })
