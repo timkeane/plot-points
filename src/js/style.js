@@ -14,12 +14,23 @@ const geocode = new Style({
   })
 })
 
-const location = new Style({
-  image: new Circle({
-    radius: 8,
-    fill: new Fill({color: 'rgba(128,61,141,.7)'}),
-    stroke: new Stroke({width: 1, color: '#803D8D'})
+const location = feature => {
+  const date1 = feature.get('date1') || '0000'
+  const date2 = feature.get('date2') || '0000'
+  const now = new Date().toISOString().split('T')[0]
+  const fresh = date1 > now || date2 > now
+  return new Style({
+    image: new Circle({
+      radius: 8,
+      fill: new Fill({
+        color: fresh ? 'rgba(128,61,141,.7)' : 'rgba(0,0,0,.5)'
+      }),
+      stroke: new Stroke({
+        width: 1, 
+        color: fresh ? '#803D8D' : '#000'
+      })
+    })
   })
-})
+}
 
 export default {geocode, location}
