@@ -4,7 +4,6 @@ import Layer from 'ol/layer/Vector'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import Papa from 'papaparse'
-import Dialog from 'nyc-lib/nyc/Dialog'
 import Basemap from 'nyc-lib/nyc/ol/Basemap'
 import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
 import Popup from 'nyc-lib/nyc/ol/FeaturePopup'
@@ -15,8 +14,6 @@ import schema from './schema'
 
 const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
 const popupHtml = '<div class="feature"></div><div class="btns"><button class="move btn rad-all">Move</button><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
-
-const dialog = new Dialog({target: 'body'})
 
 const map = new Basemap({target: 'map'})
 const popup = new Popup({map, layers: []})
@@ -146,18 +143,17 @@ $('.photo').click(() => {
   $('.photo').html(photo ? 'Base Map' : 'Aerial Photo')
 })
 
+const format = new CsvPoint({
+  x: 'x',
+  y: 'y',
+  dataProjection: 'EPSG:2263'
+})
 const loadCsv = url => {
-  new AutoLoad({
-    url,
-    format: new CsvPoint({
-      x: 'x',
-      y: 'y',
-      dataProjection: 'EPSG:2263'
+  new AutoLoad({url, format})
+    .autoLoad().then(features => {
+      source.clear()
+      source.addFeatures(features)
     })
-  }).autoLoad().then(features => {
-    source.clear()
-    source.addFeatures(features)
-  })
 }
 
 $('.load-csv').click(() => {
@@ -165,9 +161,18 @@ $('.load-csv').click(() => {
   if (csvUrl) {
     loadCsv(csvUrl)
   } else {
-    dialog.input({}).then(url => {
-      loadCsv(url)
-    })  
+    const input = $('<input class="file-in" type="file">')
+    const reader = new FileReader()
+    reader.onload = () => {
+      source.clear()
+      source.addFeatures(format.readFeatures(reader.result))
+    }
+    $('body').append(input)
+    input.change(event => {
+      input.remove()
+      reader.readAsText(event.target.files[0])
+    })
+    input.trigger('click')
   }
 })
 
