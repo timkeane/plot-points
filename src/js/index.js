@@ -17,13 +17,17 @@ const csv_url = '/git/face-coverings/dist/data/location.csv'
 const popupHtml = '<div class="feature"></div><div class="btns"><button class="move btn rad-all">Move</button><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
 
 const map = new Basemap({target: 'map'})
-const source = new Source()
-const layer = new Layer({source, zIndex: 20000})
 const popup = new Popup({map, layers: []})
 const locationMgr = new LocationMgr({map, url: geo_url})
+const source = new Source()
+const layer = new Layer({
+  source, 
+  style: style.location,
+  zIndex: 20000
+})
 
 map.addLayer(layer)
-locationMgr.mapLocator.layer.setStyle(style)
+locationMgr.mapLocator.layer.setStyle(style.geocode)
 
 const input = (props, prop) => {
   const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
@@ -71,12 +75,18 @@ const editFeature = (coordinate, feature) => {
     html.find('.move').click(event => {
       const move = $(event.target)
       move.toggleClass('pressed')
-      feature._moving = move.hasClass('pressed')
+      feature._moving_from = move.hasClass('pressed') ? feature.getGeometry() : false
     })
 
-    html.find('.cancel').click($.proxy(popup.hide, popup))
+    html.find('.cancel').click(() => {
+      popup.hide()
+      if (feature._moving_from) {
+        feature.setGeometry(feature._moving_from)
+        feature._moving_from = false
+      }
+    })
 
-    if (feature._moving) {
+    if (feature._moving_from) {
       html.find('.move').addClass('pressed')
     }
 
