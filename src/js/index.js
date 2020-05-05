@@ -9,6 +9,7 @@ import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
 import Popup from 'nyc-lib/nyc/ol/FeaturePopup'
 import CsvPoint from 'nyc-lib/nyc/ol/format/CsvPoint'
 import AutoLoad from 'nyc-lib/nyc/ol/source/AutoLoad'
+import style from './style'
 import schema from './schema'
 
 const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
@@ -19,9 +20,10 @@ const map = new Basemap({target: 'map'})
 const source = new Source()
 const layer = new Layer({source, zIndex: 20000})
 const popup = new Popup({map, layers: []})
+const locationMgr = new LocationMgr({map, url: geo_url})
 
 map.addLayer(layer)
-new LocationMgr({map, url: geo_url})
+locationMgr.mapLocator.layer.setStyle(style)
 
 const input = (props, prop) => {
   const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
