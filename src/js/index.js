@@ -31,7 +31,7 @@ locationMgr.mapLocator.layer.setStyle(style.geocode)
 
 const input = (props, prop) => {
   const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
-  if (prop.indexOf('date') > -1) {
+  if (prop.toLowerCase().indexOf('date') > -1) {
     input.attr('type', 'date') 
   }
   return input
@@ -102,7 +102,7 @@ const getSchema = () => {
     const result = {}
     const props = features[0].getProperties()
     Object.keys(props).forEach(prop => {
-      if (prop !== 'geometry') {
+      if ($.inArray(prop, ['geometry', 'X', 'Y', 'x', 'y'])) {
         result[prop] = ''
       }
     })
@@ -115,11 +115,11 @@ map.on('click', event => {
   let feature = new Feature(getSchema())
   const point = new Point(event.coordinate)
   feature.setGeometry(point)
+  feature._addme = true
   if ($(popup.element).find('.pop').is(':visible') && $('.move').hasClass('pressed')) {
     feature = popup.feature
     feature.setGeometry(point)
   } else {
-    feature._addme = true
     map.forEachFeatureAtPixel(event.pixel, (feat, lyr) => {
       if (lyr === layer) {
         feature = feat
