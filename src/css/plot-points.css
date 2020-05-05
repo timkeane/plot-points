@@ -58,9 +58,17 @@ body * {
   border: 1px solid #ddd;
 }
 .pop .btns {
-  text-align: right;
+  text-align: center;
 }
 .pop button {
-  width: 60px;
-  margin: 5px;
+  width: 70px;
+  margin: 5px 5px 5px 0;
+}
+.delete {
+  color: red;
+  border-color: red;
+}
+.save {
+  color: green;
+  border-color: green;
 }

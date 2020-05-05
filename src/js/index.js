@@ -11,7 +11,7 @@ import schema from './schema'
 
 const url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
 
-const popupHtml = '<div class="feature"></div><div class="btns"><button class="save btn rad-all">Save</button><button class="cancel btn rad-all">Cancel</button></div>'
+const popupHtml = '<div class="feature"></div><div class="btns"><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
 
 const map = new Basemap({target: 'map'})
 const source = new Source()
@@ -52,6 +52,12 @@ const editFeature = (coordinate, feature) => {
       if (feature._addme) {
         feature._addme = false
         source.addFeature(feature)
+      }
+      popup.hide()
+    })
+    html.find('.delete').click(() => {
+      if (!feature._addme) {
+        source.removeFeature(feature)
       }
       popup.hide()
     })
