@@ -94,6 +94,10 @@ $('.csv').click(() => {
     rows.push(row)
   })
   const csv = Papa.unparse(rows, {header: true})
-  console.warn('TODO: save this csv to a file')
-  console.log(csv)
+  // this method say saveGeoJson but is just saving text - should add a saveText method
+  map.storage.saveGeoJson('location.csv', csv)
 })
+
+global.map = map
+global.source = source
+global.layer = layer
