@@ -1,0 +1,60 @@
+{
+  "name": "plot-points",
+  "version": "2.0.0",
+  "description": "Face coverings are being distributed in parks across NYC. Find the closest location.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo no tests",
+    "build": "webpack",
+    "postbuild": "cp -r ./src/css/ ./dist/ && rm ./dist/mta.html",
+    "predeploy": "yarn build",
+    "deploy": "node deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CityOfNewYork/face-coverings.git"
+  },
+  "author": "Tim Keane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CityOfNewYork/face-coverings/issues"
+  },
+  "homepage": "https://github.com/CityOfNewYork/face-coverings#readme",
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "nyc-lib": "^1.3.79",
+    "ol": "^6.2.1",
+    "papaparse": "^4.5.1",
+    "proj4": "^2.4.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.6",
+    "coveralls": "^3.0.2",
+    "jest": "^24.8.0",
+    "jest-canvas-mock": "^2.2.0",
+    "jest-fetch-mock": "^1.6.5",
+    "nyc-build-helper": "^0.0.38",
+    "webpack": "4.19.1",
+    "webpack-cli": "2.0.14"
+  },
+  "jest": {
+    "verbose": true,
+    "automock": false,
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ],
+    "setupFiles": [
+      "./__tests__/jest-setup.js"
+    ],
+    "transformIgnorePatterns": [],
+    "collectCoverage": true,
+    "coverageDirectory": "./coverage/",
+    "collectCoverageFrom": [
+      "src/js/**/*.js"
+    ]
+  }
+}
