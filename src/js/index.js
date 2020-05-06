@@ -10,6 +10,7 @@ import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
 import Popup from 'nyc-lib/nyc/ol/FeaturePopup'
 import CsvPoint from 'nyc-lib/nyc/ol/format/CsvPoint'
 import AutoLoad from 'nyc-lib/nyc/ol/source/AutoLoad'
+import FeatureTip from 'nyc-lib/nyc/ol/FeatureTip'
 import style from './style'
 import schema from './schema'
 
@@ -213,6 +214,22 @@ $('.save-csv').click(() => {
   // this method say saveGeoJson but is just saving text - should add a saveText method
   map.storage.saveGeoJson('location.csv', csv)
 })
+
+const boros = {
+  '1': 'Manhattan',
+  '2': 'Bronx',
+  '3': 'Brookly',
+  '4': 'Queens',
+  '5': 'Staten Island'
+}
+
+const label = f => {
+  return {
+    html: `<div><strong>${f.get('name')}</strong></div><div>${f.get('location')}, ${boros[f.get('boro')]}<div></div>`
+  }
+}
+
+new FeatureTip({map, tips: [{layer, label}]})
 
 global.map = map
 global.source = source
