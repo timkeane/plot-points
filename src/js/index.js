@@ -32,7 +32,7 @@ locationMgr.mapLocator.layer.setStyle(style.geocode)
 const getCsvUrl = () => {
   const search = document.location.search
   if (search && search.indexOf('csv=') > -1 && search.indexOf('=') === search.lastIndexOf('=')) {
-    return decodeURIComponent(search.split('=')[1])
+    return `${decodeURIComponent(search.split('=')[1])}?${new Date().getTime()}`
   }
 }
 
@@ -72,6 +72,7 @@ const editFeature = (coordinate, feature) => {
         }
       })
       if (feature._addme) {
+        feature._added = true
         source.addFeature(feature)
         feature._addme = false
       }
