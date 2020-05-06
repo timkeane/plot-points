@@ -3,6 +3,7 @@ import Source from 'ol/source/Vector'
 import Layer from 'ol/layer/Vector'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
+import TopoJSON from 'ol/format/TopoJSON'
 import Papa from 'papaparse'
 import Basemap from 'nyc-lib/nyc/ol/Basemap'
 import LocationMgr from 'nyc-lib/nyc/ol/LocationMgr'
@@ -25,8 +26,18 @@ const layer = new Layer({
   style: style.location,
   zIndex: 20000
 })
+const boroSource = new Source({
+  url: 'data/boro.json',
+  format: new TopoJSON({dataProjection: 'EPSG:4326'})
+})
+const boroLayer = new Layer({
+  source: boroSource, 
+  style: style.boro,
+  zIndex: -1
+})
 
 map.addLayer(layer)
+map.addLayer(boroLayer)
 locationMgr.mapLocator.layer.setStyle(style.geocode)
 
 const getCsvUrl = () => {
@@ -36,9 +47,10 @@ const getCsvUrl = () => {
   }
 }
 
-const input = (props, prop) => {
+const input = (props, prop, coordinate) => {
   if (prop === 'boro') {
-    return $(boroSelect).val(props.boro)
+    const boro = boroSource.getFeaturesAtCoordinate(coordinate)[0]
+    return $(boroSelect).val(boro ? boro.get('BoroCode') : props.boro)
   } else {
     const input = $(`<input id="${prop}" class="value" value="${props[prop]}"></input>`)
     if (prop.toLowerCase().indexOf('date') > -1) {
@@ -60,7 +72,7 @@ const editFeature = (coordinate, feature) => {
       if ($.inArray(prop, ['geometry', 'x', 'y']) === -1) {
         const nameValue = $('<div class="prop"></div>')
           .append(`<label for="${prop}" class="name">${prop}</span>`)
-          .append(input(props, prop))
+          .append(input(props, prop, coordinate))
         html.first().append(nameValue)
       }
     })
@@ -205,4 +217,6 @@ $('.save-csv').click(() => {
 global.map = map
 global.source = source
 global.layer = layer
+global.boroSource = boroSource
+global.boroLayer = boroLayer
 global.popup = popup

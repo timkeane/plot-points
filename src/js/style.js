@@ -14,6 +14,10 @@ const geocode = new Style({
   })
 })
 
+const boro = new Style({
+  fill: new Fill({color: `rgba(0,0,0,0)`})
+})
+
 const location = feature => {
   const date1 = feature.get('date1') || '0000'
   const date2 = feature.get('date2') || '0000'
@@ -37,4 +41,4 @@ const location = feature => {
   })
 }
 
-export default {geocode, location}
+export default {geocode, boro, location}
