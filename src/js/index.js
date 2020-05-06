@@ -14,7 +14,7 @@ import schema from './schema'
 
 const geo_url = 'https://maps.nyc.gov/geoclient/v1/search.json?app_key=74DF5DB1D7320A9A2&app_id=nyc-lib-example'
 const popupHtml = '<div class="feature"></div><div class="btns"><button class="move btn rad-all">Move</button><button class="save btn rad-all">Save</button><button class="delete btn rad-all">Delete</button><button class="cancel btn rad-all">Cancel</button></div>'
-const boroSelect = '<select class="value"><option value="2">Bronx</option><option value="3">Brooklyn</option><option value="1">Manhattan</option><option value="4">Queens</option><option value="5">Staten Island</option>'
+const boroSelect = '<select id="boro" class="value"><option value="2">Bronx</option><option value="3">Brooklyn</option><option value="1">Manhattan</option><option value="4">Queens</option><option value="5">Staten Island</option>'
 
 const map = new Basemap({target: 'map'})
 const popup = new Popup({map, layers: []})
@@ -67,7 +67,7 @@ const editFeature = (coordinate, feature) => {
 
     html.find('.save').click(() => {
       Object.keys(props).forEach(prop => {
-        if (prop !== 'geometry') {
+        if ($.inArray(prop, ['geometry', 'x', 'y']) === -1) {
           feature.set(prop, $(`#${prop}`).val())
         }
       })
