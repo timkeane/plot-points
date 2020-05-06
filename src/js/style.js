@@ -23,8 +23,6 @@ const location = feature => {
   const date2 = feature.get('date2') || '0000'
   const now = new Date().toISOString().split('T')[0]
   const fresh = date1 >= now || date2 >= now
-  if (feature._added)
-    console.warn(fresh,date1,date2,now);
   let fill = feature._added ? 'rgba(0,0,255,.5)' : 'rgba(0,255,0,.5)'
   let stroke = feature._added ? '#0000ff' : '#00ff00'
   if (!fresh) {
