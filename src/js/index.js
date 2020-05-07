@@ -79,13 +79,13 @@ const editFeature = (coordinate, feature) => {
     })
 
     html.find('.save').click(() => {
+      feature._modified = true
       Object.keys(props).forEach(prop => {
         if ($.inArray(prop, ['geometry', 'x', 'y']) === -1) {
           feature.set(prop, $(`#${prop}`).val())
         }
       })
       if (feature._addme) {
-        feature._added = true
         source.addFeature(feature)
         feature._addme = false
       }
