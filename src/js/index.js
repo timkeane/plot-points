@@ -218,7 +218,7 @@ $('.save-csv').click(() => {
 const boros = {
   '1': 'Manhattan',
   '2': 'Bronx',
-  '3': 'Brookly',
+  '3': 'Brooklyn',
   '4': 'Queens',
   '5': 'Staten Island'
 }
